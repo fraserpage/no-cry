@@ -39,24 +39,40 @@ class UpdateWordpressCliPluginsCommand extends Command
         $branchName = $this->checkoutNewBranchForDate();
 
         // ask wordpress cli for the list of current plugins in json format
-        exec('wp plugin list --format=json', $plugins);
+        exec('lando wp plugin list --format=json', $plugins);
 
         // parse the json into an array
         $parsedPlugins = collect(json_decode($plugins[0], true));
 
         // loop through the array and update the plugins
         $updatedPlugins = $parsedPlugins->map(function (array $plugin) {
-            exec('wp plugin update '.$plugin['name'].' --format=json', $output);
 
-            $updatedPlugin = array_key_exists(0, $output) ? json_decode($output[0], true)[0] : [];
-
-            if (empty($updatedPlugin)) {
-                $this->line("❌ {$plugin['name']} did not require updates.");
-
+            if ($plugin['update'] === 'none'){
+                $this->line("❌ {$plugin['name']} did not require updates.  ");
+                return;
+            }
+            
+            if ($plugin['update'] !== 'available'){
+                $this->line("🚨 {$plugin['name']}: {$plugin['update']}  ");
                 return;
             }
 
-            $updated = "{$plugin['name']} from {$updatedPlugin['old_version']} to version {$updatedPlugin['new_version']}";
+            exec('lando wp plugin update '.$plugin['name'].' --format=json', $output);
+
+            if (!is_array($output)){
+                $this->line("🚨 {$plugin['name']}: {$output}  ");
+                return;
+            }
+            
+            $updatedPlugin = json_decode($output[0], true);
+
+            if (!is_array($updatedPlugin)){
+                $this->line("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's a var_dump: ");
+                var_dump($updatedPlugin);
+                return;
+            }
+
+            $updated = "{$plugin['name']} from {$updatedPlugin[0]['old_version']} to version {$updatedPlugin[0]['new_version']}  ";
             $commitMessage = "deps(plugin): {$updated}";
 
             /**
