@@ -6,10 +6,11 @@ use Carbon\Carbon;
 
 trait InteractsWithGit
 {
-    public function checkoutNewBranchForDate(): string
+    public function checkoutNewBranchForDate($t): string
     {
+        $ticket = $t ? $t : $this->ask('Enter the plugin update ticket number');
         $now = Carbon::now();
-        $branchName = "plugin-updates/{$now->format('Y-m-d')}";
+        $branchName = "{$ticket}-plugin-updates-{$now->format('Y-m-d')}";
 
         exec("git checkout -b {$branchName}");
 

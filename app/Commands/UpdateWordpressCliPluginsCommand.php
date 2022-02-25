@@ -15,7 +15,7 @@ class UpdateWordpressCliPluginsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'wp:update-plugins';
+    protected $signature = 'please {ticket?}';
 
     /**
      * The description of the command.
@@ -36,10 +36,16 @@ class UpdateWordpressCliPluginsCommand extends Command
             return;
         }
 
-        $branchName = $this->checkoutNewBranchForDate();
+        $branchName = $this->checkoutNewBranchForDate( $this->argument('ticket') );
 
         // ask wordpress cli for the list of current plugins in json format
         exec('lando wp plugin list --format=json', $plugins);
+
+        if (!is_array($plugins)){
+            $this->line("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG should fix it. Here's a what 'lando wp plugin list --format=json' returned: ");
+            var_dump($plugins);
+            return;
+        }
 
         // parse the json into an array
         $parsedPlugins = collect(json_decode($plugins[0], true));
@@ -67,7 +73,7 @@ class UpdateWordpressCliPluginsCommand extends Command
             $updatedPlugin = json_decode($output[0], true);
 
             if (!is_array($updatedPlugin)){
-                $this->line("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's a var_dump: ");
+                $this->line("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
                 var_dump($updatedPlugin);
                 return;
             }
