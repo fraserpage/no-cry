@@ -23,8 +23,8 @@ Creates a CLI tool named no-cry that makes updating plugins (hopefully) not want
 
 ## To do
 1. ~~add option to specify ticket number in branch name~~
-1. include update wp core
-1. optionally specify/select branch to commit to?
+1. ~~include update wp core~~
+1. ~~optionally specify/select branch to commit to?~~
 1. figure out a nice solution to update paid plugins (Integrate SatisPress??)
 1. Figure out a way to update Must Use plugins
 
