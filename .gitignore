@@ -4,3 +4,5 @@
 /.vagrant
 /builds
 .phpunit.result.cache
+
+.DS_Store
