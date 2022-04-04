@@ -2,13 +2,16 @@
 
 namespace App\Commands;
 
+use Carbon\Carbon;
 use App\Commands\Concerns\InteractsWithGit;
+use App\Commands\Concerns\InteractsWithWpCore;
 use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 
 class UpdateWordpressCliPluginsCommand extends Command
 {
     use InteractsWithGit;
+    use InteractsWithWpCore;
 
     /**
      * The signature of the command.
@@ -36,19 +39,38 @@ class UpdateWordpressCliPluginsCommand extends Command
             return;
         }
 
-        $branchName = $this->checkoutNewBranchForDate( $this->argument('ticket') );
+        $this->checkoutNewBranchForDate( $this->argument('ticket') );
+
+        $this->line("Checking for plugin updates...");
 
         // ask wordpress cli for the list of current plugins in json format
         exec('lando wp plugin list --format=json', $plugins);
 
         if (!is_array($plugins)){
-            $this->line("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG should fix it. Here's a what 'lando wp plugin list --format=json' returned: ");
+            $this->line("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. 'lando wp plugin list --format=json' didn't return an array. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG should fix it. Here's a what we got: ");
             var_dump($plugins);
             return;
         }
 
         // parse the json into an array
-        $parsedPlugins = collect(json_decode($plugins[0], true));
+        global $arrayKey;
+        $arrayKey = 0;
+        $parsedPlugins = collect(json_decode($plugins[$arrayKey], true));
+
+        if ($parsedPlugins->isEmpty()){
+            $this->error("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. We didn't find a list of plugins where we expected it to be. Let's see what 'lando wp plugin list --format=json' returned. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG might fix it. Take a look: ");
+            var_dump($plugins);
+
+            if ($this->confirm('Want to try another array key?', true)){
+                $arrayKey = $this->ask('Cool. What key?');
+                $parsedPlugins = collect(json_decode($plugins[$arrayKey], true));
+            }
+            else{
+                return;
+            }
+        }
+
+        $this->line("Updating plugins...");
 
         // loop through the array and update the plugins
         $updatedPlugins = $parsedPlugins->map(function (array $plugin) {
@@ -59,22 +81,23 @@ class UpdateWordpressCliPluginsCommand extends Command
             }
             
             if ($plugin['update'] !== 'available'){
-                $this->line("🚨 {$plugin['name']}: {$plugin['update']}  ");
+                $this->error("🚨 {$plugin['name']}: {$plugin['update']}  ");
                 return;
             }
 
             exec('lando wp plugin update '.$plugin['name'].' --format=json', $output);
 
             if (!is_array($output)){
-                $this->line("🚨 {$plugin['name']}: {$output}  ");
+                $this->error("🚨 {$plugin['name']}: {$output}  ");
                 return;
             }
             
-            $updatedPlugin = json_decode($output[0], true);
+            global $arrayKey;
+            $updatedPlugin = json_decode($output[$arrayKey], true);
 
             if (!is_array($updatedPlugin)){
-                $this->line("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
-                var_dump($updatedPlugin);
+                $this->error("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
+                var_dump($output);
                 return;
             }
 
@@ -85,10 +108,43 @@ class UpdateWordpressCliPluginsCommand extends Command
              * @todo limit the scope of the `git add -A` to the current plugin path
              */
             exec('git add -A');
-            exec("git commit -m '{$commitMessage}'", $output);
+            exec("git commit -m '{$commitMessage}'");
 
             $this->info("✅ {$updated}");
+            return "{$updated}";
         });
+
+        $wpCore = '';
+        if ($this->confirm("Want to update WP Core?",true)){
+            $wpCore = $this->updateWPCore();
+        }
+
+        // Output what was updated
+        $this->newLine(1);
+        $this->info("------------------------------");
+        $now = Carbon::now();
+        $title = "## Updated Plugins for {$now->format('F')}:  ";
+        $this->info($title);
+        $this->info("------------------------------");
+        
+        global $updateCount;
+        $updateCount = 0;
+        $updated = $updatedPlugins->filter()->map(function($update){
+            global $updateCount;
+            $updateCount++;
+            $string = "{$updateCount}. {$update}  ";
+            $this->info($string);
+            return $string;
+        });
+        $this->newLine(1);
+        $this->info($wpCore);
+
+        if ($this->confirm("Copy updates to clipboard?", true)){
+            $imploded = $title.'\n\n'.$updated->implode('\n').'\n\n'.$wpCore;
+            exec("echo '{$imploded}' | pbcopy");
+            $this->info("Copied.");
+        }
+
     }
 
     public function workingDirectoryIsDirty(): bool
