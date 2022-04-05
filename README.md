@@ -5,6 +5,10 @@ Creates a CLI tool named no-cry that makes updating plugins (hopefully) not want
 ## Build Requrirements
 - PHP 7.4
 
+## Installing the tool
+1. the built application is included in this repo in the `/builds/` folder
+1. from the root of the project directory run `mv builds/no-cry /usr/local/bin` to move the build to your bin folder (you might need to add `sudo` to that command.)
+
 ## Building the tool
 1. composer install
 2. run `php no-cry app:build` to build the tool
@@ -15,6 +19,7 @@ Creates a CLI tool named no-cry that makes updating plugins (hopefully) not want
 1. startup lando
 1. make sure that all paid plugins are licenced locally in order to recieve updates
 1. run `no-cry please` (optionally add the plugin update ticket number as an argument like so `no-cry please 545` or wait for the prompt described below)
+    - or specify a branch (new or existing) to run the updates on like `no-cry please -b branch-name` or `no-cry please --branch branch-name`
 1. if you didn't enter the plugin update ticket number as an argument do so when prompted -- it'll be appended to the branch name
 1. you'll get an output of plugins that were updated, skipped or had errors
 1. fix any errors
