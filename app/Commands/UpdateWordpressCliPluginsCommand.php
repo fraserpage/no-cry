@@ -18,7 +18,7 @@ class UpdateWordpressCliPluginsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'please {ticket?}';
+    protected $signature = 'please {ticket?} {--B|branch=NULL}';
 
     /**
      * The description of the command.
@@ -39,7 +39,7 @@ class UpdateWordpressCliPluginsCommand extends Command
             return;
         }
 
-        $this->checkoutNewBranchForDate( $this->argument('ticket') );
+        $this->checkoutNewBranchForDate( $this->argument('ticket'), $this->option('branch') );
 
         $this->line("Checking for plugin updates...");
 
