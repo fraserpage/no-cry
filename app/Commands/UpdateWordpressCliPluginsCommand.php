@@ -123,7 +123,7 @@ class UpdateWordpressCliPluginsCommand extends Command
         $this->newLine(1);
         $this->info("------------------------------");
         $now = Carbon::now();
-        $title = "## Updated Plugins for {$now->format('F')}:  ";
+        $title = "## Updated Plugins for {$now->format('F')}  ";
         $this->info($title);
         $this->info("------------------------------");
         
@@ -140,7 +140,7 @@ class UpdateWordpressCliPluginsCommand extends Command
         $this->info($wpCore);
 
         if ($this->confirm("Copy updates to clipboard?", true)){
-            $gitHubActions = '\n\n/assign \n /unassign \n /label ~"PM Review" \n /unlabel ~"To Do"';
+            $gitHubActions = '\n\n/assign @\n/unassign @\n/label ~"PM Review" \n/unlabel ~"To Do"';
             $imploded = $title.'\n\n'.$updated->implode('\n').'\n\n'.$wpCore.$gitHubActions;
             exec("echo '{$imploded}' | pbcopy");
             $this->info("Copied.");
