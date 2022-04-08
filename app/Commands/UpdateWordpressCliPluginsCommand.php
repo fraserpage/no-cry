@@ -18,7 +18,7 @@ class UpdateWordpressCliPluginsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'please {ticket?} {--B|branch=NULL}';
+    protected $signature = 'please {ticket?} {--B|branch}';
 
     /**
      * The description of the command.
@@ -140,7 +140,8 @@ class UpdateWordpressCliPluginsCommand extends Command
         $this->info($wpCore);
 
         if ($this->confirm("Copy updates to clipboard?", true)){
-            $imploded = $title.'\n\n'.$updated->implode('\n').'\n\n'.$wpCore;
+            $gitHubActions = '\n\n/assign \n /unassign \n /label ~"PM Review" \n /unlabel ~"To Do"';
+            $imploded = $title.'\n\n'.$updated->implode('\n').'\n\n'.$wpCore.$gitHubActions;
             exec("echo '{$imploded}' | pbcopy");
             $this->info("Copied.");
         }
