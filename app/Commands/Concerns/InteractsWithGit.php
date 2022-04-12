@@ -6,10 +6,17 @@ use Carbon\Carbon;
 
 trait InteractsWithGit
 {
-    public function checkoutNewBranchForDate($t, $branchName): string
+    public function checkoutNewBranchForDate($options): string
     {
+        ['ticket' => $t, 'branch' => $branchName ] = $options;
+
+        if ($this->workingDirectoryIsDirty()) {
+            $this->error('☠️  The working directory is dirty, please commit or stash your changes before running this command.');
+            die();
+        }
+
         if (!$branchName){
-            $ticket = $t ? $t : $this->ask('Enter the plugin update ticket number');
+            $ticket = $t ?: $this->ask('Enter the plugin update ticket number');
             $now = Carbon::now();
             $branchName = "{$ticket}-plugin-updates-{$now->format('Y-m-d')}";
         }
@@ -32,5 +39,10 @@ trait InteractsWithGit
             $branchPrefix = $this->ask("Ok, lets start over. Let's make a new branch named [WHATEVER]-plugin-updates-{$now->format('Y-m-d')}. What would you like [WHATEVER] to be?");
             $this->checkoutNewBranchForDate($branchPrefix);
         }
+    }
+
+    private function workingDirectoryIsDirty(): bool
+    {
+        return ! ! exec("git status --porcelain");
     }
 }
