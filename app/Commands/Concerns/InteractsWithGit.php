@@ -30,14 +30,23 @@ trait InteractsWithGit
         return $branchName;
     }
 
-    private function branchAlreadyExists($branchName){
+    private function branchAlreadyExists($branchName): void 
+    {
         if ($this->confirm("A branch named ".$branchName." already exists. Do you want to use it?", true)){
             exec("git checkout {$branchName}");
         }
         else{
-            $now = Carbon::now();
-            $branchPrefix = $this->ask("Ok, lets start over. Let's make a new branch named [WHATEVER]-plugin-updates-{$now->format('Y-m-d')}. What would you like [WHATEVER] to be?");
-            $this->checkoutNewBranchForDate($branchPrefix);
+            if ($this->confirm("Want to try a different branch?", true)){
+                $newBranch = $this->ask("Ok. Enter a branch to use (new or existing):");
+                $this->checkoutNewBranchForDate([
+                    'ticket' => null, 
+                    'branch' => $newBranch
+                ]);
+            }
+            else{
+                $this->line('Goodbye.');
+                die();
+            }
         }
     }
 
