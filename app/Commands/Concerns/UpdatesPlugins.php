@@ -4,12 +4,14 @@ namespace App\Commands\Concerns;
 
 trait UpdatesPlugins
 {
-    public function updatePlugins($parsedPlugins): object
+    public function updatePlugins($parsedPlugins, $lando): object
     {
-      
+      global $lando;
       $this->line("Updating plugins...");
 
       return $parsedPlugins->map(function (array $plugin) {
+        
+        global $lando;
 
         if ($plugin['update'] === 'none'){
             $this->line("❌ {$plugin['name']} did not require updates.  ");
@@ -22,7 +24,7 @@ trait UpdatesPlugins
         }
 
         $this->line("Updating {$plugin['name']}...");
-        exec('lando wp plugin update '.$plugin['name'].' --format=json --quiet', $output);
+        exec("{$lando} wp plugin update {$plugin['name']} --format=json --quiet", $output);
 
         if (!is_array($output)){
             $this->error("🚨 {$plugin['name']}: {$output}  ");
@@ -38,7 +40,7 @@ trait UpdatesPlugins
             return;
         }
 
-        $properName = exec("lando wp plugin get {$plugin['name']} --field=title --quiet");
+        $properName = exec("{$lando} wp plugin get {$plugin['name']} --field=title --quiet");
 
         $updated = "{$properName} from {$updatedPlugin[0]['old_version']} to version {$updatedPlugin[0]['new_version']}  ";
         $commitMessage = "deps(plugin): {$updated}";

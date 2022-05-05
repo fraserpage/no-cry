@@ -22,7 +22,7 @@ class UpdateWordpressCliPluginsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'please {ticket?} {--b|branch=}';
+    protected $signature = 'please {ticket?} {--b|branch=} {--l|lando}';
 
     /**
      * The description of the command.
@@ -38,6 +38,9 @@ class UpdateWordpressCliPluginsCommand extends Command
      */
     public function handle()
     {
+
+        $lando = $this->option('lando') ? 'lando' : '';
+
         // Checkout our branch
         $this->checkoutNewBranchForDate([
             'ticket' => $this->argument('ticket'), 
@@ -45,13 +48,13 @@ class UpdateWordpressCliPluginsCommand extends Command
         ]);
 
         // Find out what needs updates
-        $parsedPlugins = $this->getPluginUpdates();
+        $parsedPlugins = $this->getPluginUpdates($lando);
 
         // Loop through plugins and update them
-        $updatedPlugins = $this->updatePlugins($parsedPlugins);
+        $updatedPlugins = $this->updatePlugins($parsedPlugins, $lando);
         
         // Optionally update WP Core
-        $wpCore = $this->updateWPCore();
+        $wpCore = $this->updateWPCore($lando);
         
         // Output what was updated
         $this->outputResults($updatedPlugins, $wpCore);
