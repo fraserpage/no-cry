@@ -11,7 +11,7 @@ trait ChecksForPluginUpdates
         // ask wordpress cli for the list of current plugins in json format
         exec( "{$lando} wp plugin list --format=json --quiet", $plugins);
 
-        if (!is_array($plugins)){
+        if (!is_array($plugins) || !count($plugins)){
             $this->error("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. '{$lando} wp plugin list --format=json' didn't return an array. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG should fix it. Here's a what we got: ");
             var_dump($plugins);
             die();

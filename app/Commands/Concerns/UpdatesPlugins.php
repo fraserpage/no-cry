@@ -30,6 +30,12 @@ trait UpdatesPlugins
             $this->error("🚨 {$plugin['name']}: {$output}  ");
             return;
         }
+
+        if (!count($output)){
+            $this->error("🚨 {$plugin['name']}: Something wrong!");
+            var_dump($output);
+            return;
+        }
         
         global $arrayKey;
         $updatedPlugin = json_decode($output[$arrayKey], true);
@@ -37,6 +43,11 @@ trait UpdatesPlugins
         if (!is_array($updatedPlugin)){
             $this->error("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
             var_dump($output);
+            return;
+        }
+
+        if ($updatedPlugin[0]['status'] === 'Error'){
+            $this->error("🚨🚨🚨 {$plugin['name']}: wp plugin update gave status 'Error' when attempting to upgrade from {$updatedPlugin[0]['old_version']} to {$updatedPlugin[0]['new_version']}. This is sometimes the result of unlicensed pro plugins.");
             return;
         }
 
