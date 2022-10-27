@@ -9,9 +9,7 @@ trait UpdatesPlugins
       global $lando;
       $this->line("Updating plugins...");
 
-      return $parsedPlugins->map(function (array $plugin) {
-        
-        global $lando;
+      return $parsedPlugins->map(function (array $plugin) use($lando) {
 
         if ($plugin['update'] === 'none'){
             $this->line("❌ {$plugin['name']} did not require updates.  ");
