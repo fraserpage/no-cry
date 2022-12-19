@@ -23,7 +23,7 @@ trait InteractsWithWpCore
                 $this->line($result);
 
                 exec('git add -A');
-                exec("git commit -m 'deps(wp-core): {$result}'");
+                exec('git commit -m "deps(wp-core): '.$result.'"');
 
                 return $result;
             }
