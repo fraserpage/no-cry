@@ -19,7 +19,7 @@ trait InteractsWithWpCore
                 exec("{$lando} wp core update 2>&1", $updateVersion, $updateResult);
                 exec("{$lando} wp core version 2>&1", $newVersion, $getNewVersionResult);
                 
-                $result = "Wordpress from $currentVersion[0] to $newVersion[0]";
+                $result = "Wordpress from {$currentVersion[0]} to {$newVersion[0]}";
                 $this->line($result);
 
                 exec('git add -A');
