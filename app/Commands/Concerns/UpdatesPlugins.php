@@ -58,7 +58,7 @@ trait UpdatesPlugins
          * @todo limit the scope of the `git add -A` to the current plugin path
          */
         exec('git add -A');
-        exec("git commit -m '{$commitMessage}'");
+        exec('git commit -m "'.$commitMessage.'"');
 
         $this->info("✅ {$updated}");
         return "{$updated}";
