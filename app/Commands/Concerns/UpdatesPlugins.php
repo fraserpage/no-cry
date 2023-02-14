@@ -6,7 +6,6 @@ trait UpdatesPlugins
 {
     public function updatePlugins($parsedPlugins, $lando): object
     {
-      global $lando;
       $this->line("Updating plugins...");
 
       return $parsedPlugins->map(function (array $plugin) use($lando) {
