@@ -21,8 +21,10 @@ trait ChecksForPluginUpdates
     }
 
     // Recursively traverse the array looking for the updates
-    private function pluginUpdatesFromArray($plugins, $lando, $key){
-
+    private function pluginUpdatesFromArray(array $plugins, string $lando, int $key, int $loopCount = 1){
+        
+        var_dump('loopCount:', $loopCount);
+        var_dump('key:', $key);
         $parsedPlugins = collect(json_decode($plugins[$key], true));
 
         if ($parsedPlugins->isEmpty() || !isset($parsedPlugins[0]['name'])){
@@ -35,7 +37,7 @@ trait ChecksForPluginUpdates
             }
     
             // Try the next array key
-            $this->pluginUpdatesFromArray($plugins, $lando, $key - 1);
+            $this->pluginUpdatesFromArray($plugins, $lando, $key - 1, $loopCount + 1);
         }
 
         return $parsedPlugins;
