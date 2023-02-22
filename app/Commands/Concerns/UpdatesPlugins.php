@@ -34,14 +34,7 @@ trait UpdatesPlugins
             return;
         }
         
-        global $arrayKey;
-        $updatedPlugin = json_decode($output[$arrayKey], true);
-
-        if (!is_array($updatedPlugin)){
-            $this->error("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
-            var_dump($output);
-            return;
-        }
+        $updatedPlugin = $this->pluginUpdateFromArray($output, count($output) - 1, $plugin);
 
         if ($updatedPlugin[0]['status'] === 'Error'){
             $this->error("🚨🚨🚨 {$plugin['name']}: wp plugin update gave status 'Error' when attempting to upgrade from {$updatedPlugin[0]['old_version']} to {$updatedPlugin[0]['new_version']}. This is sometimes the result of unlicensed pro plugins.");
@@ -63,4 +56,25 @@ trait UpdatesPlugins
         return "{$updated}";
       });
     }
+
+    // Recursively traverse the array looking for the update
+    private function pluginUpdateFromArray($updateOutput, $key, $plugin){
+
+        $updatedPlugin = json_decode($updateOutput[$key], true);
+
+        if (!is_array($updatedPlugin) || !isset($updatedPlugin[0]['name'])){
+            if ($key === 0){
+                $this->error("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
+    
+                var_dump($updatedPlugin);
+    
+            }
+    
+            // Try the next array key
+            $this->pluginUpdatesFromArray($updateOutput, $key - 1, $plugin);
+        }
+
+        return $updatedPlugin;
+    }
+
 }

@@ -5,3 +5,5 @@
 .phpunit.result.cache
 
 .DS_Store
+
+dev-notes.txt

@@ -17,24 +17,28 @@ trait ChecksForPluginUpdates
             die();
         }
 
-        // parse the json into an array
-        global $arrayKey;
-        $arrayKey = 0;
-        $parsedPlugins = collect(json_decode($plugins[$arrayKey], true));
+        return $this->pluginUpdatesFromArray($plugins, $lando, count($plugins) - 1);
+    }
 
-        if ($parsedPlugins->isEmpty()){
-            $this->error("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. We didn't find a list of plugins where we expected it to be. Let's see what '{$lando} wp plugin list --format=json' returned. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG might fix it. Take a look: ");
-            var_dump($plugins);
+    // Recursively traverse the array looking for the updates
+    private function pluginUpdatesFromArray($plugins, $lando, $key){
 
-            if ($this->confirm('Want to try another array key?', true)){
-                $arrayKey = $this->ask('Cool. What key?');
-                $parsedPlugins = collect(json_decode($plugins[$arrayKey], true));
-            }
-            else{
+        $parsedPlugins = collect(json_decode($plugins[$key], true));
+
+        if ($parsedPlugins->isEmpty() || !isset($parsedPlugins[0]['name'])){
+            if ($key === 0){
+                $this->error("🚨🚨🚨🚨🚨🚨🚨 Oh boy, something's wrong. We didn't find a list of plugins where we expected it to be. Let's see what '{$lando} wp plugin list --format=json' returned. If wordpress is showing a 'PHP Notice' turning off WP_DEBUG might fix it. Take a look: ");
+    
+                var_dump($plugins);
+    
                 die();
             }
+    
+            // Try the next array key
+            $this->pluginUpdatesFromArray($plugins, $lando, $key - 1);
         }
 
         return $parsedPlugins;
     }
+
 }
