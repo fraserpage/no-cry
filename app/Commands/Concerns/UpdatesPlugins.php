@@ -71,7 +71,7 @@ trait UpdatesPlugins
             }
     
             // Try the next array key
-            $this->pluginUpdatesFromArray($updateOutput, $key - 1, $plugin);
+            $this->pluginUpdateFromArray($updateOutput, $key - 1, $plugin);
         }
 
         return $updatedPlugin;
