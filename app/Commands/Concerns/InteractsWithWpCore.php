@@ -4,6 +4,8 @@ namespace App\Commands\Concerns;
 
 trait InteractsWithWpCore
 {
+    use Helpers;
+
     public function updateWPCore($lando): string
     {
            
@@ -11,26 +13,34 @@ trait InteractsWithWpCore
         exec("{$lando} wp core check-update --format=json 2>&1", $updateCheck);
 
         if (count($updateCheck)){
-            if ($this->confirm("There's a WordPress update available. Install it?",true)){
 
-                exec("{$lando} wp core version 2>&1", $currentVersion, $getVersionResult);
+            $updateResults = $this->getCommandOutput($updateCheck, 'version',"Something went wrong checking for a Wordpress update.");
 
-                $this->line("Updating Wordpress...");
-                exec("{$lando} wp core update 2>&1", $updateVersion, $updateResult);
+            if (is_array($updateResults)){
 
-                exec("{$lando} wp core version 2>&1", $newVersion, $getNewVersionResult);
-                
-                $result = "Wordpress from {$currentVersion[count($currentVersion)-1]} to {$newVersion[count($newVersion)-1]}";
-                $this->line($result);
+                if ($this->confirm("There's a WordPress update available. Install it?",true)){
 
-                exec('git add -A');
-                exec('git commit -m "deps(wp-core): '.$result.'"');
-
-                return $result;
+                    exec("{$lando} wp core version --quiet --skip-themes 2>&1", $currentVersion);
+    
+                    $this->line("Updating Wordpress...");
+                    exec("{$lando} wp core update --quiet --skip-themes 2>&1", $updateVersion);
+    
+                    exec("{$lando} wp core version --quiet --skip-themes 2>&1", $newVersion);
+                    
+                    $result = "Wordpress from {$currentVersion[count($currentVersion)-1]} to {$newVersion[count($newVersion)-1]}";
+                    $this->line($result);
+    
+                    exec('git add -A');
+                    exec('git commit -m "deps(wp-core): '.$result.'"');
+    
+                    return $result;
+                }
+                else{
+                    return '';
+                }
             }
-            else{
-                return '';
-            }
+
+           
         }
         else{
             $this->line("------------------------------");
