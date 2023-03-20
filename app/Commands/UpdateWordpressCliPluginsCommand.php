@@ -57,7 +57,7 @@ class UpdateWordpressCliPluginsCommand extends Command
         $wpCore = $this->updateWPCore($lando);
         
         // Output what was updated
-        $this->outputResults($updatedPlugins, $wpCore);
+        $this->outputResults($updatedPlugins, $wpCore, $this->argument('ticket'));
 
     }
 }

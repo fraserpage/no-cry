@@ -6,7 +6,7 @@ trait InteractsWithWpCore
 {
     use Helpers;
 
-    public function updateWPCore($lando): string
+    public function updateWPCore($lando)
     {
            
         $result = '';
@@ -14,7 +14,8 @@ trait InteractsWithWpCore
 
         if (count($updateCheck)){
 
-            $updateResults = $this->getCommandOutput($updateCheck, 'version',"Something went wrong checking for a Wordpress update.");
+            // No error message here as `wp core check-update --format=json` returns nothing if on current version
+            $updateResults = $this->getCommandOutput($updateCheck, 'version', '', false, true);
 
             if (is_array($updateResults)){
 

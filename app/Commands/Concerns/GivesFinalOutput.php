@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 trait GivesFinalOutput
 {
-    public function outputResults($updatedPlugins, $wpCore): void
+    public function outputResults($updatedPlugins, $wpCore, $ticketNumber = null): void
     {
       $this->newLine(1);
       $this->info("------------------------------");
@@ -28,10 +28,12 @@ trait GivesFinalOutput
       $this->info($wpCore);
 
       if ($this->confirm("Copy updates to clipboard?", true)){
-          $gitHubActions = '\n\n@\n/assign @\n/unassign @\n/label ~"PM Review" \n/unlabel ~"To Do"';
-          $imploded = $title.'\n\n'.$updated->implode('\n').'\n\n'.$wpCore.$gitHubActions;
-          exec("echo '{$imploded}' | pbcopy");
-          $this->info("Copied.");
+        $wpCore = $wpCore ? '\n\n'.$wpCore : '';
+        $ticket = $ticketNumber ? '\n\nRelated to #'.$ticketNumber : '';
+        $gitHubActions = '\n\n@\n/assign @\n/unassign @\n/label ~"PM Review" \n/unlabel ~"To Do"';
+        $imploded = $title.'\n\n'.$updated->implode('\n').$wpCore.$ticket.$gitHubActions;
+        exec("echo '{$imploded}' | pbcopy");
+        $this->info("Copied.");
       }
 
     }

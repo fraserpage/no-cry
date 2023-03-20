@@ -10,7 +10,7 @@ trait UpdatesPlugins
     {
       $this->line("Updating plugins...");
 
-      return collect($parsedPlugins)->map(function (array $plugin) use($lando) {
+      return collect($parsedPlugins)->map(function (array $plugin) use ($lando) {
 
         if ($plugin['update'] === 'none'){
             $this->line("❌ {$plugin['name']} did not require updates.  ");
@@ -38,9 +38,7 @@ trait UpdatesPlugins
             return;
         }
 
-        $properName = exec("{$lando} wp plugin get {$plugin['name']} --field=title --quiet --skip-themes");
-
-        $updated = "{$properName} from {$updatedPlugin[0]['old_version']} to version {$updatedPlugin[0]['new_version']}  ";
+        $updated = "{$plugin['title']} from {$updatedPlugin[0]['old_version']} to version {$updatedPlugin[0]['new_version']}  ";
         $commitMessage = "deps(plugin): {$updated}";
 
         /**
