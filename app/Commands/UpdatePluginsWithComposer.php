@@ -25,7 +25,7 @@ class UpdatePluginsWithComposer extends Command
      *
      * @var string
      */
-    protected $signature = 'composer {ticket?} {--b|branch=} {--l|lando}';
+    protected $signature = 'composer {ticket?} {--b|branch=} {--l|lando} {--t|valet}';
 
     /**
      * The description of the command.
@@ -44,6 +44,8 @@ class UpdatePluginsWithComposer extends Command
 
         $lando = $this->option('lando') ? 'lando' : '';
 
+        $valet = $this->option('valet') ? 'valet' : '';
+
         // Checkout our branch
         $this->checkoutNewBranchForDate([
             'ticket' => $this->argument('ticket'), 
@@ -56,8 +58,8 @@ class UpdatePluginsWithComposer extends Command
         $preUpdateCoreVersion = $preUpdateCore[count($preUpdateCore)-1];
 
         // Run composer update
-        $this->info('running "composer update"...');
-        exec("composer update");
+        $this->info("running '{$valet} composer update'...");
+        exec("{$valet} composer update");
 
         // Get new core and plugin versions
         $postUpdatePlugins = $this->getPluginUpdates($lando);
