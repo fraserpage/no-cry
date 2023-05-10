@@ -34,6 +34,12 @@ trait Helpers
 
         $decodedOutput = json_decode($rawOutput[$key], true);
 
+        if(is_string($decodedOutput)){
+            $regex = '/\[[^\]]+\]/'; // Matches anything inside square brackets
+            preg_match($regex, $decodedOutput, $matches);
+            $decodedOutput = json_decode($matches[0], true);
+        }
+
         // we expect our decoded output to be an array of plugins each having a (e.g.) name. 
         // check the first plugin has the key (e.g. name) we're looking for.
         if(isset($decodedOutput[0][$requiredKey])){
