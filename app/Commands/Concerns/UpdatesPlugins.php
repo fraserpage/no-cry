@@ -33,6 +33,17 @@ trait UpdatesPlugins
         
         $updatedPlugin = $this->getCommandOutput($output, "name", "🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
 
+        if(
+            is_null($updatedPlugin) 
+            || empty($updatedPlugin[0]['status']) 
+            || empty($updatedPlugin[0]['old_version']) 
+            || empty($updatedPlugin[0]['new_version'])
+        ){
+            $this->error("🚨🚨🚨 {$plugin['name']}: Something went wrong. Here's what we know: ");
+            var_dump($output);
+            return;
+        }
+
         if ($updatedPlugin[0]['status'] === 'Error'){
             $this->error("🚨🚨🚨 {$plugin['name']}: wp plugin update gave status 'Error' when attempting to upgrade from {$updatedPlugin[0]['old_version']} to {$updatedPlugin[0]['new_version']}. This is sometimes the result of unlicensed pro plugins.");
             return;
