@@ -31,6 +31,11 @@ trait Helpers
           $key = count($rawOutput) - 1; 
         }
 
+        if(empty($rawOutput[$key])){
+            $this->doError("error in getCommandOutput. Key {$key} does not exist in rawOutput:", $rawOutput);
+            return;
+        }
+
         $decodedOutput = json_decode($rawOutput[$key], true);
 
         if(is_string($decodedOutput)){
@@ -48,12 +53,16 @@ trait Helpers
             $this->getCommandOutput($rawOutput, $requiredKey, $error, $dieOnError, $key - 1);
         }
         else{
-            $this->error($error);
-            var_dump($rawOutput);
+            $this->doError($error, $rawOutput, $dieOnError);
+        }
+    }
 
-            if($dieOnError){
-              die();
-            }
+    public function doError($message, $dump, $die = false){
+        $this->error($message);
+        var_dump($dump);
+
+        if($die){
+          die();
         }
     }
     
