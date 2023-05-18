@@ -25,7 +25,6 @@ trait Helpers
         string $requiredKey, 
         string $error = "🚨🚨🚨 Sorry something went wrong.", 
         bool $dieOnError = false,
-        bool $skipError = false,
         int $key = null
     ){
         if(is_null($key)){
@@ -46,7 +45,7 @@ trait Helpers
             return $decodedOutput;
         }
         else if($key > 0){
-            $this->getCommandOutput($rawOutput, $requiredKey, $error, $dieOnError, $skipError, $key - 1);
+            $this->getCommandOutput($rawOutput, $requiredKey, $error, $dieOnError, $key - 1);
         }
         else{
             $this->error($error);
