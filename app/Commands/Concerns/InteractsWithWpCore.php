@@ -15,7 +15,7 @@ trait InteractsWithWpCore
         if (count($updateCheck)){
 
             // No error message here as `wp core check-update --format=json` returns nothing if on current version
-            $updateResults = $this->getCommandOutput($updateCheck, 'version', '', false, true);
+            $updateResults = $this->getCommandOutput($updateCheck, 'version', '', false);
 
             if (is_array($updateResults)){
 
