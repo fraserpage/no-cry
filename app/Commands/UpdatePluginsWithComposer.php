@@ -8,7 +8,6 @@ use App\Commands\Concerns\GivesFinalOutput;
 use App\Commands\Concerns\Helpers;
 use App\Commands\Concerns\InteractsWithGit;
 use App\Commands\Concerns\InteractsWithWpCore;
-use Illuminate\Console\Scheduling\Schedule;
 use LaravelZero\Framework\Commands\Command;
 
 class UpdatePluginsWithComposer extends Command
@@ -41,7 +40,6 @@ class UpdatePluginsWithComposer extends Command
      */
     public function handle()
     {
-
         $lando = $this->option('lando') ? 'lando' : '';
 
         $valet = $this->option('valet') ? 'valet' : '';

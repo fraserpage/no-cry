@@ -37,6 +37,16 @@ Creates a new branch, runs updates, individually commits them and gives you a ni
 #### Specify branch to run on
 - Specify a branch (new or existing) to run the updates on like `no-cry please -b branch-name` or `no-cry please --branch branch-name`
 
+### Config file
+Add a .no-cry.json file in the root of your project to save you from entering arguments each time you run the tool. 
+
+```
+{
+  "lando": true,
+  "ticket": "999"
+}
+```
+
 ### Prompts
 1. if you didn't enter the plugin update ticket number as an argument you'll be prompted to -- it'll be appended to the branch name like: `{$ticket}-plugin-updates-{$now->format('Y-m-d')}`
 1. the tool will ask if you'd like to update WP Core

@@ -4,6 +4,7 @@ namespace App\Commands;
 
 use LaravelZero\Framework\Commands\Command;
 use App\Commands\Concerns\ChecksForPluginUpdates;
+use App\Commands\Concerns\GetConfigFile;
 use App\Commands\Concerns\GivesFinalOutput;
 use App\Commands\Concerns\InteractsWithGit;
 use App\Commands\Concerns\InteractsWithWpCore;
@@ -16,6 +17,7 @@ class UpdateWordpressCliPluginsCommand extends Command
     use InteractsWithGit;
     use InteractsWithWpCore;
     use UpdatesPlugins;
+    use GetConfigFile;
 
     /**
      * The signature of the command.
@@ -38,13 +40,21 @@ class UpdateWordpressCliPluginsCommand extends Command
      */
     public function handle()
     {
+        $config = $this->getConfig();
 
-        $lando = $this->option('lando') ? 'lando' : '';
-
+        if(!empty($config->lando)){
+            $this->info('"lando" value found in .no-cry.json. Using that setting.');
+            $lando = $config->lando ? 'lando' : '';
+        }
+        else{
+            $lando = $this->option('lando') ? 'lando' : '';
+        }
+        
         // Checkout our branch
         $this->checkoutNewBranchForDate([
             'ticket' => $this->argument('ticket'), 
-            'branch' => $this->option('branch')
+            'branch' => $this->option('branch'),
+            'config' => $config
         ]);
 
         // Find out what needs updates
