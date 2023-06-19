@@ -4,6 +4,7 @@ namespace App\Commands;
 
 use App\Commands\Concerns\ChecksForPluginUpdates;
 use App\Commands\Concerns\ComparesPluginLists;
+use App\Commands\Concerns\GetConfigFile;
 use App\Commands\Concerns\GivesFinalOutput;
 use App\Commands\Concerns\Helpers;
 use App\Commands\Concerns\InteractsWithGit;
@@ -18,6 +19,7 @@ class UpdatePluginsWithComposer extends Command
     use InteractsWithGit;
     use InteractsWithWpCore;
     use Helpers;
+    use GetConfigFile;
 
     /**
      * The signature of the command.
@@ -40,14 +42,23 @@ class UpdatePluginsWithComposer extends Command
      */
     public function handle()
     {
-        $lando = $this->option('lando') ? 'lando' : '';
+        $config = $this->getConfig();
+
+        if(!empty($config->lando)){
+            $this->info('"lando" value found in .no-cry.json. Using that setting.');
+            $lando = $config->lando ? 'lando' : '';
+        }
+        else{
+            $lando = $this->option('lando') ? 'lando' : '';
+        }
 
         $valet = $this->option('valet') ? 'valet' : '';
 
         // Checkout our branch
         $this->checkoutNewBranchForDate([
             'ticket' => $this->argument('ticket'), 
-            'branch' => $this->option('branch')
+            'branch' => $this->option('branch'),
+            'config' => $config
         ]);
 
         // Get current core and plugin versions

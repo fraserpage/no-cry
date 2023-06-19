@@ -11,7 +11,6 @@ trait GetConfigFile
     if (File::exists('.no-cry.json')){
       $config = File::get('.no-cry.json');
       if(!empty($config)){
-        var_dump(json_decode($config));
         return json_decode($config);
       }
     }
