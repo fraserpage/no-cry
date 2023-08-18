@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use LaravelZero\Framework\Commands\Command;
 use App\Commands\Concerns\ChecksForPluginUpdates;
 use App\Commands\Concerns\ComparesPluginLists;
 use App\Commands\Concerns\GetConfigFile;
@@ -9,7 +10,6 @@ use App\Commands\Concerns\GivesFinalOutput;
 use App\Commands\Concerns\Helpers;
 use App\Commands\Concerns\InteractsWithGit;
 use App\Commands\Concerns\InteractsWithWpCore;
-use LaravelZero\Framework\Commands\Command;
 
 class UpdatePluginsWithComposer extends Command
 {
@@ -90,7 +90,7 @@ class UpdatePluginsWithComposer extends Command
 
                 $updateResults = $this->getCommandOutput($updateCheck, 'version',"Something went wrong checking for a Wordpress update.");
     
-                if (is_array($updateResults)){
+                if (!empty($updateResults['version'])){
 
                     $this->info("Currently on WP {$postUpdateCoreVersion}. Wordpress version {$updateResults['version']} is available. If WP Core is managed by composer update the version requirements to upgrade.");
                 }
